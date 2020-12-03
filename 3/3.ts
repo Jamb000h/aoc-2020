@@ -1,37 +1,44 @@
 import { readLinesToArray, productOf } from "../utils";
 
-const rowHasTreeInRepeatingIndex = (row: string, index: number) => {
+const rowHasTreeInWrappingIndex = (row: string, index: number) => {
   return row.charAt(index % row.length) === "#";
 };
 
-const part1 = (input: string[]) => {
-  let x = 0;
-  let trees = 0;
-  for (let i = 0; i < input.length; i += 1) {
-    if (rowHasTreeInRepeatingIndex(input[i], x)) {
-      trees++;
+interface Slope {
+  x: number;
+  y: number;
+}
+
+const findTreesInSlopes = (input: string[], slopes: Slope[]) => {
+  const currentXs = new Array(slopes.length).fill(0);
+  const trees = new Array(slopes.length).fill(0);
+  for (let i = 0; i < input.length; i++) {
+    for (let j = 0; j < slopes.length; j++) {
+      if (i % slopes[j].y === 0) {
+        if (rowHasTreeInWrappingIndex(input[i], currentXs[j])) {
+          trees[j]++;
+        }
+        currentXs[j] += slopes[j].x;
+      }
     }
-    x += 1;
   }
   return trees;
 };
 
+const part1 = (input: string[]) => {
+  const slopes = [{ x: 3, y: 1 }];
+  return findTreesInSlopes(input, slopes)[0];
+};
+
 const part2 = (input: string[]) => {
-  const slopeYs = [1, 1, 1, 1, 2];
-  const slopeXs = [1, 3, 5, 7, 1];
-  const currentXs = [0, 0, 0, 0, 0];
-  const trees = [0, 0, 0, 0, 0];
-  for (let i = 0; i < input.length; i++) {
-    for (let j = 0; j < currentXs.length; j++) {
-      if (i % slopeYs[j] === 0) {
-        if (rowHasTreeInRepeatingIndex(input[i], currentXs[j])) {
-          trees[j]++;
-        }
-        currentXs[j] += slopeXs[j];
-      }
-    }
-  }
-  return productOf(trees);
+  const slopes = [
+    { x: 1, y: 1 },
+    { x: 3, y: 1 },
+    { x: 5, y: 1 },
+    { x: 7, y: 1 },
+    { x: 1, y: 2 },
+  ];
+  return productOf(findTreesInSlopes(input, slopes));
 };
 
 readLinesToArray(__dirname + "/input.txt").then((inputData) => {
