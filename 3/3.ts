@@ -1,4 +1,5 @@
 import { readLinesToArray, productOf } from "../utils";
+
 interface Slope {
   x: number;
   y: number;

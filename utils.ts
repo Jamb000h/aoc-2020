@@ -1,11 +1,11 @@
-const readline = require("readline");
-const fs = require("fs");
+import { createInterface } from "readline";
+import { createReadStream } from "fs";
 
 export const readLinesToArray = async (filename: string) => {
   const data: string[] = [];
 
-  const rl = readline.createInterface({
-    input: fs.createReadStream(filename),
+  const rl = createInterface({
+    input: createReadStream(filename),
     crlfDelay: Infinity,
   });
 
