@@ -61,12 +61,12 @@ const isValidPID = (pid: string) => {
   return pid.trim().match(/^[0-9]{9}$/) !== null;
 };
 
-const isPassportPart1 = (obj: any): obj is Passport => {
+const isPassport = (obj: any): obj is Passport => {
   return requiredKeys.every((key) => obj[key] !== undefined);
 };
 
-const isPassportPart2 = (obj: any): obj is Passport => {
-  if (isPassportPart1(obj)) {
+const isValidPassport = (obj: any) => {
+  if (isPassport(obj)) {
     return (
       isValidBYR(obj.byr) &&
       isValidIYR(obj.iyr) &&
@@ -117,12 +117,12 @@ const parseInputIntoObjects = (input: string[]): Object[] =>
 
 const part1 = (input: string[]) => {
   const parsedPassports = parseInputIntoObjects(input);
-  return parsedPassports.filter((passport) => isPassportPart1(passport)).length;
+  return parsedPassports.filter((passport) => isPassport(passport)).length;
 };
 
 const part2 = (input: string[]) => {
   const parsedPassports = parseInputIntoObjects(input);
-  return parsedPassports.filter((passport) => isPassportPart2(passport)).length;
+  return parsedPassports.filter((passport) => isValidPassport(passport)).length;
 };
 
 readLinesToArray(__dirname + "/input.txt").then((inputData) => {
