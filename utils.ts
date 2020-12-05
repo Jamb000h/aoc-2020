@@ -23,3 +23,8 @@ export const sumOf = (numbers: number[]) => {
 export const productOf = (numbers: number[]) => {
   return numbers.reduce((x, y) => x * y, 1);
 };
+
+export const averageOf = (numbers: number[], floor = false) => {
+  const avg = numbers.reduce((prev, cur) => prev + cur, 0) / numbers.length;
+  return floor ? Math.floor(avg) : Math.round(avg);
+};
