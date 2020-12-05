@@ -1,6 +1,6 @@
 import { readLinesToArray, averageOf } from "../utils";
 
-const lolWhatIsBSP = (input: string, range: [number, number]): number => {
+const bsp = (input: string, range: [number, number]): number => {
   const takeLowerControlCharacters = ["F", "L"];
   const takeUppercontrolCharacters = ["B", "R"];
 
@@ -13,16 +13,16 @@ const lolWhatIsBSP = (input: string, range: [number, number]): number => {
   }
 
   if (takeLowerControlCharacters.includes(input.charAt(0))) {
-    return lolWhatIsBSP(input.slice(1), [range[0], averageOf(range, true)]);
+    return bsp(input.slice(1), [range[0], averageOf(range, true)]);
   }
 
-  return lolWhatIsBSP(input.slice(1), [averageOf(range), range[1]]);
+  return bsp(input.slice(1), [averageOf(range), range[1]]);
 };
 
 const calculateSeats = (input: string[]) => {
   const seats = input.map((seatString) => {
-    const row = lolWhatIsBSP(seatString.substring(0, 7), [0, 127]);
-    const seat = lolWhatIsBSP(seatString.substring(7), [0, 7]);
+    const row = bsp(seatString.substring(0, 7), [0, 127]);
+    const seat = bsp(seatString.substring(7), [0, 7]);
 
     return {
       row: row,
