@@ -1,5 +1,5 @@
 import { createInterface } from "readline";
-import { createReadStream } from "fs";
+import { createReadStream, readFileSync } from "fs";
 
 export const readLinesToArray = async (filename: string) => {
   const data: string[] = [];
@@ -14,6 +14,10 @@ export const readLinesToArray = async (filename: string) => {
   }
 
   return data;
+};
+
+export const readFile = (filename: string) => {
+  return readFileSync(filename, "utf-8").trim();
 };
 
 export const sumOf = (numbers: number[]) => {
