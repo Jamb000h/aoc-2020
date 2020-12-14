@@ -17,7 +17,7 @@ const part1 = (input: string[]): number => {
 };
 
 const findReciprocal = (b: bigint, n: bigint, N: bigint): bigint => {
-  if (BigInt((b * N) / n) % BigInt(n) === 1n) {
+  if (((b * N) / n) % n === 1n) {
     return b;
   }
 
