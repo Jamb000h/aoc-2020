@@ -47,6 +47,17 @@ const canBeOccupied = (row: number, column: number, grid: Grid): boolean => {
   return true;
 };
 
+const canBeOccupied2 = (grid: any, square: any): boolean => {
+  let canBeOccupied = true;
+  square.visibleNodes.forEach((node) => {
+    if (grid[node.y][node.x].value === SquareState.OCCUPIED) {
+      canBeOccupied = false;
+    }
+  });
+
+  return canBeOccupied;
+};
+
 const cannotBeOccupiedAnymore = (
   row: number,
   column: number,
@@ -79,6 +90,17 @@ const cannotBeOccupiedAnymore = (
   }
 
   return occupiedAround >= 4;
+};
+
+const cannotBeOccupiedAnymore2 = (grid: any, square: any): boolean => {
+  let occupiedAround = 0;
+  square.visibleNodes.forEach((node) => {
+    if (grid[node.y][node.x].value === SquareState.OCCUPIED) {
+      occupiedAround++;
+    }
+  });
+
+  return occupiedAround >= 5;
 };
 
 const gameOfSeats = (grid: Grid): Grid => {
@@ -124,6 +146,148 @@ const countOccupied = (grid: Grid): number => {
   return occupied;
 };
 
+const addNearestVisibleSeats = (grid: any) => {
+  for (let row = 0; row < grid.length; row++) {
+    for (let column = 0; column < grid[row].length; column++) {
+      const visibleNodes = [];
+      const diagonalDifference = row - column;
+      const antidiagonalSum = row + column;
+      // diagonal before
+      let diagonalBefore = undefined;
+      grid.slice(0, row).forEach((innerRow, innerRowIndex) => {
+        innerRow.forEach((innerColumn, innerColumnIndex) => {
+          let innerDiagonalDifference = innerRowIndex - innerColumnIndex;
+          if (innerDiagonalDifference === diagonalDifference) {
+            if (innerRow[innerColumnIndex].value !== SquareState.FLOOR) {
+              diagonalBefore = { x: innerColumnIndex, y: innerRowIndex };
+            }
+          }
+        });
+      });
+      if (diagonalBefore) visibleNodes.push(diagonalBefore);
+      // diagonal after
+      let diagonalAfter = undefined;
+      grid.slice(row + 1).forEach((innerRow, innerRowIndex) => {
+        innerRow.forEach((innerColumn, innerColumnIndex) => {
+          if (diagonalAfter) return;
+          let innerDiagonalDifference =
+            innerRowIndex + row + 1 - innerColumnIndex;
+          if (innerDiagonalDifference === diagonalDifference) {
+            if (innerRow[innerColumnIndex].value !== SquareState.FLOOR) {
+              diagonalAfter = {
+                x: innerColumnIndex,
+                y: innerRowIndex + row + 1,
+              };
+            }
+          }
+        });
+      });
+      if (diagonalAfter) visibleNodes.push(diagonalAfter);
+      // antidiagonal before
+      let antidiagonalBefore = undefined;
+      grid.slice(0, row).forEach((innerRow, innerRowIndex) => {
+        innerRow.forEach((innerColumn, innerColumnIndex) => {
+          let innerAntidiagonalSum = innerRowIndex + innerColumnIndex;
+          if (innerAntidiagonalSum === antidiagonalSum) {
+            if (innerRow[innerColumnIndex].value !== SquareState.FLOOR) {
+              antidiagonalBefore = { x: innerColumnIndex, y: innerRowIndex };
+            }
+          }
+        });
+      });
+      if (antidiagonalBefore) visibleNodes.push(antidiagonalBefore);
+      // antidiagonal after
+      let antidiagonalAfter = undefined;
+      grid.slice(row + 1).forEach((innerRow, innerRowIndex) => {
+        innerRow.forEach((innerColumn, innerColumnIndex) => {
+          if (antidiagonalAfter) return;
+          let innerAntidiagonalSum = innerRowIndex + row + 1 + innerColumnIndex;
+          if (innerAntidiagonalSum === antidiagonalSum) {
+            if (innerRow[innerColumnIndex].value !== SquareState.FLOOR) {
+              antidiagonalAfter = {
+                x: innerColumnIndex,
+                y: innerRowIndex + row + 1,
+              };
+            }
+          }
+        });
+      });
+      if (antidiagonalAfter) visibleNodes.push(antidiagonalAfter);
+      // column before
+      let columnBefore = undefined;
+      grid.slice(0, row).forEach((innerRow, index) => {
+        if (innerRow[column].value !== SquareState.FLOOR) {
+          columnBefore = { x: column, y: index };
+        }
+      });
+      if (columnBefore) visibleNodes.push(columnBefore);
+      // column after
+      let columnAfter = undefined;
+      grid.slice(row + 1).forEach((innerRow, index) => {
+        if (!columnAfter && innerRow[column].value !== SquareState.FLOOR) {
+          columnAfter = { x: column, y: index + row + 1 };
+        }
+      });
+      if (columnAfter) visibleNodes.push(columnAfter);
+      // row before
+      let rowBefore = undefined;
+      grid[row].slice(0, column).forEach((square, index) => {
+        if (square.value !== SquareState.FLOOR) {
+          rowBefore = { x: index, y: row };
+        }
+      });
+      if (rowBefore) visibleNodes.push(rowBefore);
+      // row after
+      let rowAfter = undefined;
+      grid[row].slice(column + 1).forEach((square, index) => {
+        if (!rowAfter && square.value !== SquareState.FLOOR) {
+          rowAfter = { x: column + index + 1, y: row };
+        }
+      });
+      visibleNodes.push(rowAfter);
+
+      grid[row][column].visibleNodes = visibleNodes.filter(
+        (node) => node !== undefined
+      );
+    }
+  }
+};
+
+const gameOfSeats2 = (grid: any): any => {
+  const gridClone = grid.map((row) =>
+    row
+      .slice()
+      .map((x) => ({ value: x.value, visibleNodes: [...x.visibleNodes] }))
+  );
+  let changed = false;
+  for (let row = 0; row < grid.length; row++) {
+    for (let column = 0; column < grid[row].length; column++) {
+      const square = grid[row][column];
+      if (square.value === SquareState.FLOOR) {
+        continue;
+      }
+
+      if (square.value === SquareState.EMPTY) {
+        if (canBeOccupied2(grid, square)) {
+          gridClone[row][column].value = SquareState.OCCUPIED;
+          changed = true;
+        }
+      }
+
+      if (square.value === SquareState.OCCUPIED) {
+        if (cannotBeOccupiedAnymore2(grid, square)) {
+          gridClone[row][column].value = SquareState.EMPTY;
+          changed = true;
+        }
+      }
+    }
+  }
+  if (changed) {
+    return gameOfSeats2(gridClone);
+  }
+  return grid;
+};
+
 const part1 = (input: string[]): number => {
   const grid = inputToGrid(input);
   const finalGrid = gameOfSeats(grid);
@@ -132,7 +296,13 @@ const part1 = (input: string[]): number => {
 };
 
 const part2 = (input: string[]) => {
-  return;
+  const grid = inputToGrid(input).map((x) => x.map((r) => ({ value: r })));
+  addNearestVisibleSeats(grid);
+  const result = gameOfSeats2(grid);
+  const occupied = result
+    .reduce((prev, cur) => [...prev, ...cur], [])
+    .filter((x) => x.value === SquareState.OCCUPIED);
+  return occupied.length;
 };
 
 readLinesToArray(__dirname + "/input.txt").then((inputData) => {
