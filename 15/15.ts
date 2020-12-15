@@ -1,27 +1,34 @@
 import { readFile } from "../utils";
 
-const part1 = (input: string): number => {
-  const rounds = 2020;
-  const numbers = input.split(",").map(Number);
-  const numbersSaid = numbers.reduce((prev, cur, index) => {
-    return { ...prev, [cur]: { last: index + 1, times: 1 } };
-  }, {});
-  let previousNumber = numbers[numbers.length - 1];
-  for (let i = numbers.length + 1; i <= rounds; i++) {
-    if (!numbersSaid[previousNumber]) {
-      numbersSaid[previousNumber] = { last: i - 1, times: 1 };
+const calculateNthNumber = (input: number[], rounds: number) => {
+  const numbersSaid = new Array(rounds);
+  input.forEach((n, i) => {
+    numbersSaid[n] = i + 1;
+  });
+  let previousNumber = 0;
+  for (let i = input.length + 2; i <= rounds; i++) {
+    if (numbersSaid[previousNumber] === undefined) {
+      numbersSaid[previousNumber] = i - 1;
       previousNumber = 0;
     } else {
-      const difference = i - 1 - numbersSaid[previousNumber].last;
-      numbersSaid[previousNumber].last = i - 1;
+      const difference = i - 1 - numbersSaid[previousNumber];
+      numbersSaid[previousNumber] = i - 1;
       previousNumber = difference;
     }
   }
   return previousNumber;
 };
 
+const part1 = (input: string): number => {
+  const rounds = 2020;
+  const numbers = input.split(",").map(Number);
+  return calculateNthNumber(numbers, rounds);
+};
+
 const part2 = (input: string): number => {
-  return;
+  const rounds = 30000000;
+  const numbers = input.split(",").map(Number);
+  return calculateNthNumber(numbers, rounds);
 };
 
 const data = readFile(__dirname + "/input.txt");
